@@ -3,7 +3,6 @@ set -eu
 
 REPO="andy-portmen/native-client"
 API="https://api.github.com/repos/$REPO/releases/latest"
-TOKEN=${GITHUB_TOKEN:-}
 
 TMPDIR="$(mktemp -d 2>/dev/null || mktemp -d -t nativeclient)"
 cleanup() { rm -rf "$TMPDIR"; }
@@ -12,17 +11,9 @@ trap cleanup EXIT
 download() {
   url="$1"; out="$2"
   if command -v curl >/dev/null 2>&1; then
-    if [ -n "$TOKEN" ]; then
-      curl -fsSL -H "Authorization: token $TOKEN" -o "$out" "$url"
-    else
-      curl -fsSL -o "$out" "$url"
-    fi
+    curl -fsSL -o "$out" "$url"
   elif command -v wget >/dev/null 2>&1; then
-    if [ -n "$TOKEN" ]; then
-      wget -qO "$out" --header="Authorization: token $TOKEN" "$url"
-    else
-      wget -qO "$out" "$url"
-    fi
+    wget -qO "$out" "$url"
   else
     echo "Error: curl or wget required" >&2
     exit 2
